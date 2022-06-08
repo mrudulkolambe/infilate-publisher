@@ -35,7 +35,7 @@ export default function Home() {
             <button onClick={signIn} className='flex items-center justify-center text-white font-bold bg-gray-900 duration-200 px-3 py-2 rounded-lg hover:bg-gray-700 mt-5 w-full'>{loading ? <Spinner /> : 'Sign In'}</button>
           </div>
           <div className='text-sm font-bold mt-2 text-right'>
-            <span>Don't Have An Account ? {" "}<Link href={'/signup'}>Sign Up</Link></span>
+            <span>{"Don't Have An Account ? "}<Link href={'/signup'}>Sign Up</Link></span>
           </div>
         </div>
       </div>
@@ -55,7 +55,7 @@ export default function Home() {
             <button onClick={signIn} className='text-white font-bold bg-gray-900 duration-200 px-3 py-2 rounded-lg hover:bg-gray-700 mt-3 w-full'>Send Mail</button>
           </div>
           <div className='text-sm font-bold mt-2 text-right'>
-            <span>Don't Have An Account ? {" "}<Link href={'/signup'}>Sign Up</Link></span>
+            <span>{"Don't Have An Account ?  "}<Link href={'/signup'}>Sign Up</Link></span>
           </div>
         </div>
       </div>

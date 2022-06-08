@@ -32,7 +32,7 @@ const Topbar = ({ show, setShow }) => {
 				<div className='flex justify-between px-5 items-center h-20'>
 					{
 						navs.map((nav) => {
-							return <Link href={nav.path} ><p className='cursor-pointer p-3 bg-blue-500 py-1 rounded-md'>{nav.tab}</p></Link>
+							return <Link href={nav.path} key={nav.path}><p className='cursor-pointer p-3 bg-blue-500 py-1 rounded-md'>{nav.tab}</p></Link>
 						})
 					}
 				</div>

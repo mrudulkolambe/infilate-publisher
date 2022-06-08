@@ -17,7 +17,7 @@ const CampaignUpload = () => {
 			<div className='hidden lg:block left-position absolute top-20 px-10 py-6 Nunito w-10/12 h-calc overflow-scroll'>
 				<div className='flex justify-between items-center'>
 					<div className='w-8/12 mx-2 h-40 rounded-lg shadow-lg bg-red-400 p-4 flex flex-col justify-around'>
-						<h1 className='text-2xl font-bold'>Max Yesterday's Earning</h1>
+						<h1 className='text-2xl font-bold'>{"Max Yesterday's Earning"}</h1>
 						<span className='mt-3 text-6xl font-extrabold'>0</span>
 					</div>
 					<div className='w-4/12 mx-2 h-40 rounded-lg shadow-lg bg-red-400 p-4 flex flex-col justify-around'>
@@ -37,7 +37,7 @@ const CampaignUpload = () => {
 			<div className='lg:hidden sm:block absolute top-20 px-5 py-6 Nunito w-full'>
 				<div className='flex flex-col items-center'>
 					<div className='w-full mx-2 h-40 rounded-lg shadow-lg bg-red-400 p-4 flex flex-col justify-around'>
-						<h1 className='text-2xl font-bold'>Max Yesterday's Earning</h1>
+						<h1 className='text-2xl font-bold'>{"Max Yesterday's Earning"}</h1>
 						<span className='mt-3 text-6xl font-extrabold'>0</span>
 					</div>
 					<div className='mt-3 w-full mx-2 h-32 rounded-lg shadow-lg bg-red-400 p-4 flex flex-col justify-around'>

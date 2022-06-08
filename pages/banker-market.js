@@ -1,6 +1,7 @@
 import React,{useState} from 'react'
 import Link from 'next/link'
 import {MdOutlineClose} from 'react-icons/md'
+import Spinner from '../components/Spinner'
 
 const BankerMarket = () => {
 	const [loading, setLoading] = useState(false)
