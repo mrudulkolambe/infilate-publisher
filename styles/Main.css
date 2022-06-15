@@ -1,3 +1,4 @@
+
 @import url("https://fonts.googleapis.com/css?family=Nunito:200,300,regular,500,600,700,800,900,200italic,300italic,italic,500italic,600italic,700italic,800italic,900italic");
 
 *, html, body{
@@ -30,4 +31,20 @@
 }
 .h-calc{
   height: calc(100vh - 5rem);
+}
+
+.zindexMax{
+  z-index: 5000;
+}
+
+.h-calc-height{
+  height: calc(100vh - 7.5rem);
+}
+.bg-gradient-top{
+  background: linear-gradient(90deg, orange, red, blue);
+}
+
+.accent-color{
+  background-color: #030343;
+  color: white;
 }

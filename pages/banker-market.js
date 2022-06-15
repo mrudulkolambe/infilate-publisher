@@ -2,14 +2,16 @@ import React,{useState} from 'react'
 import Link from 'next/link'
 import {MdOutlineClose} from 'react-icons/md'
 import Spinner from '../components/Spinner'
+import {useRouter} from 'next/router'
 
 const BankerMarket = () => {
 	const [loading, setLoading] = useState(false)
+	const router = useRouter()
 	return (
 		<>
 			<div className='hidden lg:flex left-position absolute top-20 px-5 py-6 Nunito w-10/12 justify-center items-center calc-height'>
 				<div className='w-6/12 shadow-lg p-5 rounded-lg border'>
-					<div className='p-3 rounded-full duration-150 hover:bg-gray-100 bg-opacity-30 absolute top-6 right-6'><MdOutlineClose/></div>
+					<div className='p-3 rounded-full duration-150 hover:bg-gray-100 bg-opacity-30 absolute top-6 right-6 cursor-pointer' onClick={() => {router.back()}}><MdOutlineClose/></div>
 					<h1 className="text-center font-bold text-3xl mb-6">Banker Market</h1>
 					<div className='flex flex-col items-start mt-3'>
 						<label htmlFor='name' className='font-bold text-gray-600 cursor-pointer'>Customer Name</label>
@@ -35,7 +37,7 @@ const BankerMarket = () => {
 
 			<div className='lg:hidden sm:block absolute top-20 px-5 py-6 Nunito w-full flex flex-col md:flex-row  justify-center items-center calc-height'>
 				<div className='w-full shadow-lg p-3 rounded-lg mt-5'>
-				<div className='p-3 rounded-full duration-150 hover:bg-gray-100 bg-opacity-30 absolute top-6 right-6'><MdOutlineClose/></div>
+				<div className='p-3 rounded-full duration-150 hover:bg-gray-100 bg-opacity-30 absolute top-6 right-6 cursor-pointer' onClick={() => {router.back()}}><MdOutlineClose/></div>
 					<h1 className='mt-4 font-bold text-4xl'>Infilate Sign Up</h1>
 					<div className='flex flex-col items-start mt-3'>
 						<label htmlFor='name' className='font-bold text-gray-600 cursor-pointer'>Customer Name</label>

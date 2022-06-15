@@ -3,8 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { auth, db } from "./firebase_config";
 import { secondaryAuth } from "./firebase_config2";
 import { useRouter } from "next/router";
-import { doc, setDoc } from "firebase/firestore";
-
+import { collection, doc, getDocs, increment, onSnapshot, orderBy, query, setDoc, updateDoc, where } from "firebase/firestore";
 
 
 const AuthContext = createContext();
@@ -12,6 +11,11 @@ const AuthContext = createContext();
 export function AuthContextProvider({ children }) {
 	const [user, setUser] = useState()
 	const router = useRouter()
+	const [totalAmount, setTotalAmount] = useState(0)
+	const [advertiserHoldAmount, setAdvertiserHoldAmount] = useState(0)
+	const [applyForValidationData, setApplyForValidationData] = useState()
+	const [alert, setAlert] = useState('')
+	const [withdrawalAmount, setWithdrawalAmount] = useState(0)
 
 	const handleSignOut = () => {
 		signOut(auth).then(() => {
@@ -21,46 +25,148 @@ export function AuthContextProvider({ children }) {
 			// An error happened.
 		});
 	}
+	const getTimeData = () => {
+		let dateOBJ = new Date()
+		let day = dateOBJ.getDate();
+		let month = dateOBJ.getMonth() + 1;
+		let year = dateOBJ.getFullYear();
+		if (day <= 9) {
+			day = `0${day}`
+		}
+		if (month <= 9) {
+			month = `0${month}`
+		}
+		let dateString1 = `${day}-${month}-${year}`
+		return dateString1
+	}
 
-	const handleSignIn = (email, password) => {
+	const handleSignIn = async (email, password) => {
 		signInWithEmailAndPassword(auth, email, password)
-			.then((userCredential) => {
+			.then(async (userCredential) => {
 				const user = userCredential.user;
+				const unsub = onSnapshot(doc(db, "publisher_kyc", user.uid), (doc) => {
+					user.kyc = doc.data().status
+				});
 				setUser(user)
 				router.push('/store')
+				const q = query(collection(db, "campaign_details"), where("publisher_id", "==", user.uid), where('reached_advertiser_hold', '==', false), where('timestamp', '<=', Date.now()), where('ready_for_withdrawal', '==', 0),
+					orderBy('timestamp'));
+				let holdAmount = 0
+				const querySnapshot = await getDocs(q)
+				const arr = [];
+				querySnapshot && querySnapshot.forEach(async (document) => {
+					let obj = document.data()
+					obj.id = document.id
+					arr.push(obj);
+					holdAmount += obj.revenue
+					let docRef = doc(db, "campaign_details", obj.id);
+					await updateDoc(docRef, {
+						reached_advertiser_hold: true,
+					})
+				})
+				setApplyForValidationData(arr)
+				const docRef = doc(db, "publisher_database", user.uid);
+				if (holdAmount !== 0) {
+					await updateDoc(docRef, {
+						advertiserAmount: holdAmount,
+						applied_for_verification: false,
+						validationData: arr
+					})
+						.then(async () => {
+							setAlert('Your wallet has been updated, Please check!')
+						});
+					setAdvertiserHoldAmount(holdAmount)
+				} else {
+					const unsub = onSnapshot(doc(db, "publisher_database", user.uid), (document) => {
+						setAdvertiserHoldAmount(document.data().advertiserAmount)
+					});
+				}
 			})
 			.catch((error) => {
-				const errorCode = error.code;
-				const errorMessage = error.message;
+				console.log(error.message)
+				setAlert(error.message)
 			});
 	}
+
+	useEffect(() => {
+		if (user) {
+			manageData(user)
+		}
+	}, [user]);
+
+	const manageData = async (user) => {
+		const q = query(collection(db, "campaign_details"), where("publisher_id", "==", user.uid), where('ready_for_withdrawal', '>', 0), where('completed_withdrawal', '==', false));
+		const querySnapshot = await getDocs(q)
+		const arr = [];
+		let finalAmount = 0
+		querySnapshot.forEach(async (document) => {
+			let obj = document.data()
+			obj.id = document.id
+			arr.push(obj);
+			finalAmount += document.data().ready_for_withdrawal
+			console.log(document.data())
+			arr.push(document.data())
+		})
+		arr && arr.forEach(async (data) => {
+			let docRef = doc(db, "campaign_details", data.id);
+			await updateDoc(docRef, {
+				completed_withdrawal: true,
+			})
+			let docRef2 = doc(db, 'publisher_database', user.uid)
+			console.log(data.ready_for_withdrawal)
+			await updateDoc(docRef2, {
+				advertiserAmount: 0,
+				applied_for_verification: false,
+				withdraw_data: arr,
+				withdrawal_amount: increment(data && data.ready_for_withdrawal)
+			})
+		})
+		setWithdrawalAmount(finalAmount)
+		setApplyForValidationData(arr)
+		const docRef = doc(db, "publisher_database", user.uid);
+		if (finalAmount !== 0) {
+			setWithdrawalAmount(finalAmount)
+		} else {
+			const unsub = onSnapshot(doc(db, "publisher_database", user.uid), (document) => {
+				setAdvertiserHoldAmount(document.data().advertiserAmount)
+				setWithdrawalAmount(document.data().withdrawal_amount)
+			});
+		}
+	}
+
 	const handleSignUp = (email, password, name) => {
-		createUserWithEmailAndPassword(auth, email, password)
+		createUserWithEmailAndPassword(secondaryAuth, email, password)
 			.then((userCredential) => {
 				const user = userCredential.user;
 				console.log(user)
 				updateProfile(user, {
 					displayName: name
-				}).then(async() => {
+				}).then(async () => {
 					console.log(user)
-					await setDoc(doc(db, "publisher_database", user.uid), {username: name, email: user.email, uid: user.uid })
-					.then(() => {
-						router.push('/')
-					})
+					await setDoc(doc(db, "publisher_database", user.uid), { username: name, email: user.email, uid: user.uid })
+						.then(() => {
+							router.push('/')
+							setUser()
+						})
 				}).catch((error) => {
 					console.log(error)
 				});
 			})
 			.catch((error) => {
-				const errorCode = error.code;
-				const errorMessage = error.message;
-				// ..
+				setAlert(error.message)
 			});
-
 	}
 
+	useEffect(() => {
+		if (alert.length !== 0) {
+			setTimeout(() => {
+				setAlert('')
+			}, 3000);
+		}
+	}, [alert]);
+
 	return (
-		<AuthContext.Provider value={{ auth, handleSignIn, user, handleSignOut, handleSignUp }}>
+		<AuthContext.Provider value={{ auth, handleSignIn, user, handleSignOut, handleSignUp, alert, setAlert, totalAmount, setTotalAmount, advertiserHoldAmount, setUser, applyForValidationData, withdrawalAmount, setWithdrawalAmount }}>
 			{children}
 		</AuthContext.Provider>
 	);

@@ -2,11 +2,12 @@ import React, { useState } from 'react'
 import { BsSearch } from 'react-icons/bs'
 import HeadComponent from '../components/HeadComponent'
 import ReportManagerTableRow from '../components/ReportManagerTableRow'
+import { useMainData } from '../context/Main'
 import { useReportData } from '../context/reportData'
 
 
 const ReportManager = () => {
-	const { reportData } = useReportData()
+	const { mainData } = useMainData()
 	return (
 		<>
 			<HeadComponent title={'Report Manager'} />
@@ -37,7 +38,7 @@ const ReportManager = () => {
 						</thead>
 						<tbody className='mt-3 height-report overflow-auto'>
 							{
-								reportData && reportData.map((data, i) => {
+								mainData && mainData.map((data, i) => {
 									return <ReportManagerTableRow key={data.id} index={i} data={data} />
 								})
 							}
@@ -73,7 +74,7 @@ const ReportManager = () => {
 						</thead>
 						<tbody className='mt-3 height-report overflow-auto'>
 							{
-								reportData && reportData.map((data, i) => {
+								mainData && mainData.map((data, i) => {
 									return <ReportManagerTableRow key={data.id} index={i} data={data} />
 								})
 							}

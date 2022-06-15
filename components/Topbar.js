@@ -28,11 +28,11 @@ const Topbar = ({ show, setShow }) => {
 	]
 	return (
 		<>
-			<div className='lg:block hidden w-10/12 fixed top-0 left-position border-b h-20 bg-white shadow-lg z-50 Nunito'>
+			<div className='lg:block hidden w-10/12 fixed top-6 left-position border-b h-20 bg-white shadow-lg z-50 Nunito rounded-tr-3xl'>
 				<div className='flex justify-between px-5 items-center h-20'>
 					{
 						navs.map((nav) => {
-							return <Link href={nav.path} key={nav.path}><p className='cursor-pointer p-3 bg-blue-500 py-1 rounded-md'>{nav.tab}</p></Link>
+							return <Link href={nav.path} key={nav.path}><p className='cursor-pointer p-3 accent-color py-1 rounded-md'>{nav.tab}</p></Link>
 						})
 					}
 				</div>

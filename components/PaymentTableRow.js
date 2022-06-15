@@ -1,24 +1,16 @@
 import React, { useState } from 'react'
-import { HiOutlineChevronDown, HiOutlineChevronUp } from 'react-icons/hi'
 
 
-const PaymentTableRow = () => {
-	const [expand, setExpand] = useState(false)
+const PaymentTableRow = ({ data }) => {
 	return (
 		<>
-			<div className='w-full border-b'>
+			<div className='w-full border shadow-lg px-3 my-1 py-2 rounded-xl'>
 				<div className='py-2 flex w-full'>
-					<div className='w-6/12'>Publisher Name</div>
-					<div className='w-3/12'>Payment Due</div>
-					<div className='w-3/12 flex justify-between cursor-pointer'>Last Payment {!expand ? <HiOutlineChevronDown onClick={() => { expand ? setExpand(false) : setExpand(true) }} /> : <HiOutlineChevronUp onClick={() => { expand ? setExpand(false) : setExpand(true) }} />}</div>
+					<div className='w-6/12'>{data && data.name}</div>
+					<div className='w-3/12'>{data && data.amount}</div>
+					<div className='w-3/12 flex justify-between cursor-pointer'>{data && data.type}</div>
 				</div>
-				<div className={expand ? 'flex justify-between pb-3 duration-150' : 'h-0 overflow-hidden duration-150'}>
-					<div className='flex flex-col md:flex-row w-6/12'>
-						<button className='mx-2 py-1 px-3 bg-gray-900 duration-150 text-white rounded-lg hover:bg-gray-700 font-bold'>Approve Invoice</button>
-						<button className='mt-2 md:mt-0 mx-2 py-1 px-3 bg-gray-900 duration-150 text-white rounded-lg hover:bg-gray-700 font-bold'>On Hold</button>
-					</div>
-					<button className='h-max py-1 px-3 bg-red-700 duration-150 text-white rounded-lg hover:bg-red-500 font-bold'>Reject Invoice</button>
-				</div>
+
 			</div>
 		</>
 	)

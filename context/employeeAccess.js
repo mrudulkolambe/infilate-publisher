@@ -9,7 +9,7 @@ const EmployeeAccess = createContext();
 
 export function EmployeeAccessProvider({ children }) {
 	const router = useRouter()
-	const { user } = useAuthContext()
+	const { user, setUser } = useAuthContext()
 	const initialAccess = [
 		{
 			label: 'Campaign Upload',
@@ -44,7 +44,6 @@ export function EmployeeAccessProvider({ children }) {
 	const [messenger, setMessenger] = useState(initialAccess)
 	useEffect(() => {
 		if (user) {
-			console.log(user)
 			const q = query(collection(db, "employee_access"));
 			const unsubscribe = onSnapshot(q, (querySnapshot) => {
 				const data = [];
@@ -60,6 +59,7 @@ export function EmployeeAccessProvider({ children }) {
 			}
 		}else{
 			router.push('/')
+			setUser()
 		}
 	}, [user]);
 
