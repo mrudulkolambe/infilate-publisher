@@ -1,7 +1,6 @@
-import { createUserWithEmailAndPassword, signOut, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { createUserWithEmailAndPassword, signOut, signInWithEmailAndPassword, updateProfile, onAuthStateChanged, sendEmailVerification, ActionCodeOperation } from "firebase/auth";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { auth, db } from "./firebase_config";
-import { secondaryAuth } from "./firebase_config2";
 import { useRouter } from "next/router";
 import { collection, doc, getDocs, increment, onSnapshot, orderBy, query, setDoc, updateDoc, where } from "firebase/firestore";
 
@@ -47,39 +46,44 @@ export function AuthContextProvider({ children }) {
 				const unsub = onSnapshot(doc(db, "publisher_kyc", user.uid), (doc) => {
 					user.kyc = doc.data().status
 				});
-				setUser(user)
-				router.push('/store')
-				const q = query(collection(db, "campaign_details"), where("publisher_id", "==", user.uid), where('reached_advertiser_hold', '==', false), where('timestamp', '<=', Date.now()), where('ready_for_withdrawal', '==', 0),
-					orderBy('timestamp'));
-				let holdAmount = 0
-				const querySnapshot = await getDocs(q)
-				const arr = [];
-				querySnapshot && querySnapshot.forEach(async (document) => {
-					let obj = document.data()
-					obj.id = document.id
-					arr.push(obj);
-					holdAmount += obj.revenue
-					let docRef = doc(db, "campaign_details", obj.id);
-					await updateDoc(docRef, {
-						reached_advertiser_hold: true,
+				if (user.emailVerified) {
+					setUser(user)
+					router.push('/store')
+					const q = query(collection(db, "campaign_details"), where("publisher_id", "==", user.uid), where('reached_advertiser_hold', '==', false), where('timestamp', '<=', Date.now()), where('ready_for_withdrawal', '==', 0),
+						orderBy('timestamp'));
+					let holdAmount = 0
+					const querySnapshot = await getDocs(q)
+					const arr = [];
+					querySnapshot && querySnapshot.forEach(async (document) => {
+						let obj = document.data()
+						obj.id = document.id
+						arr.push(obj);
+						holdAmount += obj.revenue
+						let docRef = doc(db, "campaign_details", obj.id);
+						await updateDoc(docRef, {
+							reached_advertiser_hold: true,
+						})
 					})
-				})
-				setApplyForValidationData(arr)
-				const docRef = doc(db, "publisher_database", user.uid);
-				if (holdAmount !== 0) {
-					await updateDoc(docRef, {
-						advertiserAmount: holdAmount,
-						applied_for_verification: false,
-						validationData: arr
-					})
-						.then(async () => {
-							setAlert('Your wallet has been updated, Please check!')
+					setApplyForValidationData(arr)
+					const docRef = doc(db, "publisher_database", user.uid);
+					if (holdAmount !== 0) {
+						await updateDoc(docRef, {
+							advertiserAmount: holdAmount,
+							applied_for_verification: false,
+							validationData: arr
+						})
+							.then(async () => {
+								setAlert('Your wallet has been updated, Please check!')
+							});
+						setAdvertiserHoldAmount(holdAmount)
+					} else {
+						const unsub = onSnapshot(doc(db, "publisher_database", user.uid), (document) => {
+							setAdvertiserHoldAmount(document.data().advertiserAmount)
 						});
-					setAdvertiserHoldAmount(holdAmount)
+					}
 				} else {
-					const unsub = onSnapshot(doc(db, "publisher_database", user.uid), (document) => {
-						setAdvertiserHoldAmount(document.data().advertiserAmount)
-					});
+					router.push('/verification')
+					setAlert('Verification Email sent to your email! Also check your spam folder')
 				}
 			})
 			.catch((error) => {
@@ -89,7 +93,7 @@ export function AuthContextProvider({ children }) {
 	}
 
 	useEffect(() => {
-		if (user) {
+		if (user && user.emailVerified) {
 			manageData(user)
 		}
 	}, [user]);
@@ -134,20 +138,41 @@ export function AuthContextProvider({ children }) {
 		}
 	}
 
-	const handleSignUp = (email, password, name) => {
-		createUserWithEmailAndPassword(secondaryAuth, email, password)
+	useEffect(() => {
+		onAuthStateChanged(auth, (user) => {
+			if (user) {
+				if (user.emailVerified) {
+					const unsub = onSnapshot(doc(db, "publisher_kyc", user.uid), (doc) => {
+						user.kyc = doc.data().status
+					});
+					console.log(user)
+					setUser(user)
+				}
+				else {
+					router.push('/verification')
+					sendEmailVerification(user)
+						.then(() => {
+							setAlert('Verification Email sent to your email! Also check your spam folder')
+						});
+				}
+			}
+			else {
+				router.push('/')
+			}
+		});
+	}, []);
+
+	const handleSignUp = (email, password, name, phone) => {
+		createUserWithEmailAndPassword(auth, email, password)
 			.then((userCredential) => {
 				const user = userCredential.user;
 				console.log(user)
 				updateProfile(user, {
-					displayName: name
+					displayName: name,
+					phoneNumber: phone
 				}).then(async () => {
 					console.log(user)
-					await setDoc(doc(db, "publisher_database", user.uid), { username: name, email: user.email, uid: user.uid })
-						.then(() => {
-							router.push('/')
-							setUser()
-						})
+					await setDoc(doc(db, "publisher_database", user.uid), { username: name, email: user.email, uid: user.uid, phone: phone })
 				}).catch((error) => {
 					console.log(error)
 				});

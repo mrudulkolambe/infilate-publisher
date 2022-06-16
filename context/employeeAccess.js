@@ -43,7 +43,7 @@ export function EmployeeAccessProvider({ children }) {
 	const [finance, setFinance] = useState(initialAccess)
 	const [messenger, setMessenger] = useState(initialAccess)
 	useEffect(() => {
-		if (user) {
+	if (user && user.emailVerified) {
 			const q = query(collection(db, "employee_access"));
 			const unsubscribe = onSnapshot(q, (querySnapshot) => {
 				const data = [];

@@ -11,7 +11,7 @@ export function CampaignUploadProvider({ children }) {
 	const [campaignData, setCampaignData] = useState();
 
 	useEffect(() => {
-		if (user) {
+	if (user && user.emailVerified) {
 			const q = query(collection(db, "campaign_data"));
 			const unsubscribe = onSnapshot(q, (querySnapshot) => {
 				const data = [];

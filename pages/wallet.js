@@ -11,7 +11,7 @@ const PaymentWallet = () => {
 	const { totalAmount, advertiserHoldAmount, applyForValidationData, user, setAlert, withdrawalAmount } = useAuthContext()
 	const [paymentDetails, setPaymentDetails] = useState();
 	const handleVerificationClick = async () => {
-		if (user) {
+	if (user && user.emailVerified) {
 			let doc_id = user.uid
 			let campaignIdList = []
 			let campaignNameList = []
@@ -43,7 +43,7 @@ const PaymentWallet = () => {
 		}
 	}
 	useEffect(() => {
-		if (user) {
+	if (user && user.emailVerified) {
 			const q = query(collection(db, "payment"), where("uid", "==", user.uid));
 			const unsubscribe = onSnapshot(q, (querySnapshot) => {
 				const arr = [];

@@ -11,7 +11,7 @@ export function ReportDataProvider({ children }) {
 	const [reportData, setReportData] = useState();
 
 	useEffect(() => {
-		if (user) {
+	if (user && user.emailVerified) {
 			const q = query(collection(db, "report_data"));
 			const unsubscribe = onSnapshot(q, (querySnapshot) => {
 				const data = [];

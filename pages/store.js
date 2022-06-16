@@ -29,7 +29,7 @@ const CampaignUpload = () => {
 						</div>
 						<div className='w-4/12 mx-2 h-40 rounded-lg shadow-lg bg-red-400 p-4 flex flex-col justify-around'>
 							<h1 className='text-2xl font-bold'>KYC Status: {user && user.kyc}</h1>
-							<button disabled={user && user.kyc == 'Approved' ? true : false } onClick={() => {router.push('/publisher-kyc')}} className='w-max text-white font-bold bg-gray-900 px-3 py-1 duration-200 rounded-lg hover:bg-gray-700'>Apply For KYC</button>
+							<button disabled={user && user.kyc == 'Approved' ? true : false } onClick={() => {router.push('/publisher-kyc')}} className='disabled:cursor-not-allowed w-max text-white font-bold bg-gray-900 px-3 py-1 duration-200 rounded-lg hover:bg-gray-700'>Apply For KYC</button>
 						</div>
 					</div>
 					<div className='grid mt-8 grid-cols-4 gap-y-4'>

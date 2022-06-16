@@ -26,7 +26,7 @@ export function MainDataProvider({ children }) {
 		return dateString1
 	}
 	useEffect(() => {
-		if (user) {
+	if (user && user.emailVerified) {
 			const q = query(collection(db, "campaign_details"), where("publisher_id", "==", user.uid), where('date', '==', getTimeData()), where('reached_advertiser_hold', '==', false));
 			const unsubscribe = onSnapshot(q, (querySnapshot) => {
 				let revenue = 0
@@ -45,7 +45,7 @@ export function MainDataProvider({ children }) {
 		}
 	}, [user]);
 	useEffect(() => {
-		if (user) {
+	if (user && user.emailVerified) {
 			const q = query(collection(db, "campaign_details"), where("publisher_id", "==", user.uid));
 			const unsubscribe = onSnapshot(q, (querySnapshot) => {
 				const data = [];
@@ -64,7 +64,7 @@ export function MainDataProvider({ children }) {
 
 
 	useEffect(() => {
-		if (user) {
+	if (user && user.emailVerified) {
 			const q = query(collection(db, "campaign_details"), where('date', '==', getTimeData()));
 			const unsubscribe = onSnapshot(q, (querySnapshot) => {
 				let totalRevenue = 0

@@ -10,11 +10,12 @@ export default function Home() {
   const { handleSignUp } = useAuthContext()
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false)
   const signIn = () => {
     setLoading(true)
-    handleSignUp(email, password, name)
+    handleSignUp(email, password, name, phone)
     setTimeout(() => {
       setLoading(false)
     }, 1000);
@@ -33,6 +34,10 @@ export default function Home() {
           <div className='flex flex-col items-start mt-3'>
             <label htmlFor='email' className='font-bold text-gray-600 cursor-pointer'>Email Id</label>
             <input id='email' value={email} onChange={(e) => { setEmail(e.target.value) }} className='w-full mt-1 outline-none py-3 px-5 border border-gray-500 font-semibold rounded-lg' type="text" placeholder='eg. user@gmail.com' />
+          </div>
+          <div className='flex flex-col items-start mt-3'>
+            <label htmlFor='email' className='font-bold text-gray-600 cursor-pointer'>Phone Number</label>
+            <input id='number' value={phone} onChange={(e) => { setPhone(e.target.value) }} className='w-full mt-1 outline-none py-3 px-5 border border-gray-500 font-semibold rounded-lg' type="text" placeholder='eg. user@gmail.com' />
           </div>
           <div className='flex flex-col items-start mt-3'>
             <label htmlFor='password' className='font-bold text-gray-600 cursor-pointer'>Password</label>
@@ -57,6 +62,10 @@ export default function Home() {
           <div className='flex flex-col items-start mt-3'>
             <label htmlFor='email' className='font-bold text-gray-600 cursor-pointer'>Email Id</label>
             <input id='email' value={email} onChange={(e) => { setEmail(e.target.value) }} className='w-full mt-1 outline-none py-3 px-5 border border-gray-500 font-semibold rounded-lg' type="text" placeholder='eg. user@gmail.com' />
+          </div>
+          <div className='flex flex-col items-start mt-3'>
+            <label htmlFor='email' className='font-bold text-gray-600 cursor-pointer'>Phone Number</label>
+            <input id='email' value={phone} onChange={(e) => { setPhone(e.target.value) }} className='w-full mt-1 outline-none py-3 px-5 border border-gray-500 font-semibold rounded-lg' type="text" placeholder='eg. user@gmail.com' />
           </div>
           <div className='flex flex-col items-start mt-3'>
             <label htmlFor='password' className='font-bold text-gray-600 cursor-pointer'>Password</label>

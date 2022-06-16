@@ -6,7 +6,7 @@ import { db } from '../context/firebase_config'
 const CampaignCard = ({ data, setDisplayCard, setDetailsData }) => {
 	const { user,setAlert } = useAuthContext()
 	const handleNotification = async () => {
-		if (user) {
+	if (user && user.emailVerified) {
 			let doc_id = `${data.id}-${user.uid}`
 			let checkDataAvailable;
 			const docRef = doc(db, "Notifications", doc_id);
