@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { MdOutlineClose } from 'react-icons/md'
 import Spinner from '../../components/Spinner'
 import { useRouter } from 'next/router'
-import { doc, onSnapshot, setDoc } from "firebase/firestore";
+import { addDoc, collection, doc, onSnapshot, setDoc } from "firebase/firestore";
 import { useAuthContext } from '../../context/Auth'
 import { db } from '../../context/firebase_config'
 import { useCampaignUpload } from '../../context/store'
