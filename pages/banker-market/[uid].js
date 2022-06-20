@@ -38,7 +38,8 @@ const BankerMarket = () => {
 	useEffect(() => {
 		if (currentCampaign) {
 			let item = Object.values(adminData.trackingURLs).filter(handleFilter)
-			setTrackingLink(item[0].trackingLink)
+			console.log(item)
+			setTrackingLink(item && item[0].trackingLink)
 		}
 	}, [currentCampaign, adminData]);
 
