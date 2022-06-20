@@ -55,8 +55,8 @@ const BankerMarket = () => {
 					<h1 className='font-bold text-3xl'>Data: </h1>
 					<div className='grid mt-3 gap-y-6 grid-cols-3'>
 						{
-							bankerData && bankerData.map((data) => {
-								return <BankerCard data={data} />
+							bankerData && bankerData.map((data, i) => {
+								return <BankerCard key={i} data={data} />
 							})
 						}
 					</div>
