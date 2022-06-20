@@ -10,24 +10,24 @@ const CampaignUploadDetails = ({ setDisplayCard, data }) => {
 				<div className='flex mt-6 sticky'>
 					<div className='px-2 w-3/12'>
 						<div className='flex flex-col items-center'>
-							<img className='h-5/6 w-5/6' src="https://png.pngtree.com/png-clipart/20190520/original/pngtree-vector-users-icon-png-image_4144740.jpg" alt="" />
+							<img className='h-7/12 w-full aspect-video' src={data && data.img} alt="" />
 							<h1 className='mt-2 text-3xl font-bold text-center'>{data && data.campaign_name}</h1>
 						</div>
 					</div>
 					<div className='px-2 w-9/12'>
 						<div className='flex'>
-							<div className='mx-1 px-8 rounded-lg py-4 w-8/12 bg-red-300'>Payout upto 32%</div>
-							<div className='mx-1 px-8 rounded-lg py-4 w-4/12 bg-green-300'>Active</div>
+							<div className='mx-1 px-8 rounded-lg py-4 w-8/12 border'>Type: {data && data.type}</div>
+							<div className='mx-1 px-8 rounded-lg py-4 w-4/12 border'>Active</div>
 						</div>
 						<div className='flex mt-4'>
-							<div className='mx-1 px-8 rounded-lg py-4 w-3/12 bg-red-300'>CPS</div>
-							<div className='mx-1 px-8 rounded-lg py-4 w-6/12 bg-red-300'>{data && data.advertiser_name}</div>
-							<div className='mx-1 px-8 rounded-lg py-4 w-3/12 bg-green-300'>11</div>
+							<div className='mx-1 px-8 rounded-lg py-4 w-3/12 border'>CPS</div>
+							<div className='mx-1 px-8 rounded-lg py-4 w-6/12 border'>{data && data.advertiser_name}</div>
+							<div className='mx-1 px-8 rounded-lg py-4 w-3/12 border'>11</div>
 						</div>
 						<div className='flex mt-4'>
-							<div className='mx-1 px-8 rounded-lg overflow-scroll py-4 w-full h-72 bg-green-300'>{data && data.campaign_brief}</div>
+							<div className='mx-1 px-8 rounded-lg overflow-scroll py-4 w-full h-72 border'>{data && data.campaign_brief}</div>
 						</div>
-						<CampaignUploadDetailsComponent />
+						<CampaignUploadDetailsComponent data={data} />
 					</div>
 				</div>
 			</div>
@@ -43,21 +43,21 @@ const CampaignUploadDetails = ({ setDisplayCard, data }) => {
 					</div>
 					<div className='w-full'>
 						<div className='flex flex-col'>
-							<div className='my-1  px-8 rounded-lg py-4 w-full bg-red-300'>Payout upto 32%</div>
-							<div className='my-1  px-8 rounded-lg py-4 w-full bg-green-300'>Active</div>
+							<div className='my-1  px-8 rounded-lg py-4 w-full border'>Payout upto 32%</div>
+							<div className='my-1  px-8 rounded-lg py-4 w-full border'>Active</div>
 						</div>
 						<div className='flex mt-4 flex-col'>
-							<div className='my-1  px-8 rounded-lg py-4 w-full bg-red-300'>Payout upto 32%</div>
-							<div className='my-1  px-8 rounded-lg py-4 w-full bg-red-300'>Payout upto 32%</div>
-							<div className='my-1  px-8 rounded-lg py-4 w-full bg-green-300'>Active</div>
+							<div className='my-1  px-8 rounded-lg py-4 w-full border'>Payout upto 32%</div>
+							<div className='my-1  px-8 rounded-lg py-4 w-full border'>Payout upto 32%</div>
+							<div className='my-1  px-8 rounded-lg py-4 w-full border'>Active</div>
 						</div>
 						<div className='flex mt-4'>
-							<div className=' px-8 rounded-lg overflow-scroll py-4 w-full h-72 bg-green-300'>Active</div>
+							<div className=' px-8 rounded-lg overflow-scroll py-4 w-full h-72 border'>Active</div>
 						</div>
-						<CampaignUploadDetailsComponent />
+						<CampaignUploadDetailsComponent data={data} />
 					</div>
 				</div>
-			</div>s
+			</div>
 		</>
 	)
 }

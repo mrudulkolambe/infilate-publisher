@@ -1,6 +1,6 @@
 import React from 'react'
 
-const CampaignUploadDetailsComponent = () => {
+const CampaignUploadDetailsComponent = ({data}) => {
 	return (
 		<>
 			<div className='mt-6 px-2'>
@@ -12,9 +12,9 @@ const CampaignUploadDetailsComponent = () => {
 					</div>
 					<div className='w-full flex justify-between text-left font-bold my-3'>
 						<span className='w-7/12'>Advertiser Pricing</span>
-						<span className='w-5/12 text-blue-700'>700</span>
+						<span className='w-5/12 text-blue-700'>{data && data.advertiser_pricing}</span>
 					</div>
-					<div className='w-full flex justify-between text-left font-bold my-3'>
+					<div className='w-full justify-between text-left font-bold my-3 hidden'>
 						<span className='w-7/12'>Affilitate Pricing</span>
 						<span className='w-5/12 text-blue-700'>500</span>
 					</div>

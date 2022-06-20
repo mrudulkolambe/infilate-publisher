@@ -11,20 +11,19 @@ export function CampaignUploadProvider({ children }) {
 	const [campaignData, setCampaignData] = useState();
 
 	useEffect(() => {
-	if (user && user.emailVerified) {
-			const q = query(collection(db, "campaign_data"));
-			const unsubscribe = onSnapshot(q, (querySnapshot) => {
-				const data = [];
-				querySnapshot.forEach((doc) => {
-					let obj = doc.data()
-					obj.id = doc.id
-					data.push(obj)
-				});
-				setCampaignData(data)
+		console.log(user)
+		const q = query(collection(db, "campaign_data"));
+		const unsubscribe = onSnapshot(q, (querySnapshot) => {
+			const data = [];
+			querySnapshot.forEach((doc) => {
+				let obj = doc.data()
+				obj.id = doc.id
+				data.push(obj)
 			});
-			return () => {
-				unsubscribe()
-			}
+			setCampaignData(data)
+		});
+		return () => {
+			unsubscribe()
 		}
 	}, [user]);
 

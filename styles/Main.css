@@ -48,3 +48,8 @@
   background-color: #030343;
   color: white;
 }
+
+.min-height-banker-container{
+  height: max-content;
+  max-height: calc(100vh - 7.5rem);
+}

@@ -1,64 +1,67 @@
-import React,{useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
-import {MdOutlineClose} from 'react-icons/md'
+import { MdOutlineClose } from 'react-icons/md'
 import Spinner from '../components/Spinner'
-import {useRouter} from 'next/router'
+import { useRouter } from 'next/router'
+import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { useAuthContext } from '../context/Auth'
+import BankerCard from '../components/BankerCard'
+import { db } from '../context/firebase_config'
 
 const BankerMarket = () => {
 	const [loading, setLoading] = useState(false)
+	const [url, setURL] = useState('')
+	const [btn, setBtn] = useState('Copy!')
 	const router = useRouter()
+	console.log(router)
+	const { user, setAlert } = useAuthContext()
+	const [bankerData, setBankerData] = useState()
+	useEffect(() => {
+		if (user) {
+			setURL(`${window.location.origin}/banker-market/${user && user.uid}`)
+			const q = query(collection(db, "banker_data"), where("publisher_uid", "==", user.uid));
+			const unsubscribe = onSnapshot(q, (querySnapshot) => {
+				const arr = [];
+				querySnapshot.forEach((doc) => {
+					let obj = doc.data()
+					obj.id = doc.id
+					arr.push(obj);
+				});
+				setBankerData(arr)
+			});
+		}
+	}, [user]);
+
+	const copyFunc = () => {
+		setBtn('Copied!');
+		navigator.clipboard.writeText(url)
+		setAlert('Link Copied!')
+		setTimeout(() => {
+			setBtn('Copy!')
+		}, 1000);
+	}
 	return (
 		<>
-			<div className='hidden lg:flex left-position absolute top-20 px-5 py-6 Nunito w-10/12 justify-center items-center calc-height'>
-				<div className='w-6/12 shadow-lg p-5 rounded-lg border'>
-					<div className='p-3 rounded-full duration-150 hover:bg-gray-100 bg-opacity-30 absolute top-6 right-6 cursor-pointer' onClick={() => {router.back()}}><MdOutlineClose/></div>
-					<h1 className="text-center font-bold text-3xl mb-6">Banker Market</h1>
-					<div className='flex flex-col items-start mt-3'>
-						<label htmlFor='name' className='font-bold text-gray-600 cursor-pointer'>Customer Name</label>
-						<input id='name' className='w-full mt-1 outline-none py-3 px-5 border border-gray-500 font-semibold rounded-lg' type="text" placeholder='John Doe' />
-					</div>
-					<div className='flex flex-col items-start mt-3'>
-						<label htmlFor='email' className='font-bold text-gray-600 cursor-pointer'>Contact Number</label>
-						<input id='email' className='w-full mt-1 outline-none py-3 px-5 border border-gray-500 font-semibold rounded-lg' type="text" placeholder='eg. user@gmail.com' />
-					</div>
-					<div className='flex flex-col items-start mt-3'>
-						<label htmlFor='password' className='font-bold text-gray-600 cursor-pointer'>Customer Email Address</label>
-						<input id='password' className='w-full mt-1 outline-none py-3 px-5 border border-gray-500 font-semibold rounded-lg' type="text" placeholder='********' />
-					</div>
-					<div className='flex flex-col items-start mt-3'>
-						<label htmlFor='password' className='font-bold text-gray-600 cursor-pointer'>Pincode</label>
-						<input id='password' className='w-full mt-1 outline-none py-3 px-5 border border-gray-500 font-semibold rounded-lg' type="text" placeholder='********' />
-					</div>
-					<div>
-						<button className='flex items-center justify-center text-white font-bold bg-gray-900 duration-200 px-3 py-2 rounded-lg hover:bg-gray-700 mt-5 w-full'>{loading ? <Spinner /> : 'Sign Up'}</button>
+			<div className='hidden lg:block left-position absolute top-20 px-5 py-6 Nunito w-10/12'>
+				<div className='mt-4 flex items-center'>
+					<label>Banker URL: </label>
+					<div className='relative'>
+						<input type="text" className='outline-none cursor-pointer ml-4 px-4 py-2 rounded-lg w-96 border-2' value={url} readOnly />
+						<button onClick={copyFunc} className='hover:bg-blue-500 duration-300 ml-3 font-bold text-white px-2 py-1 w-20 bg-blue-600 rounded-lg'>{btn}</button>
 					</div>
 				</div>
-			</div>
 
-			<div className='lg:hidden sm:block absolute top-20 px-5 py-6 Nunito w-full flex flex-col md:flex-row  justify-center items-center calc-height'>
-				<div className='w-full shadow-lg p-3 rounded-lg mt-5'>
-				<div className='p-3 rounded-full duration-150 hover:bg-gray-100 bg-opacity-30 absolute top-6 right-6 cursor-pointer' onClick={() => {router.back()}}><MdOutlineClose/></div>
-					<h1 className='mt-4 font-bold text-4xl'>Infilate Sign Up</h1>
-					<div className='flex flex-col items-start mt-3'>
-						<label htmlFor='name' className='font-bold text-gray-600 cursor-pointer'>Customer Name</label>
-						<input id='name' className='w-full mt-1 outline-none py-3 px-5 border border-gray-500 font-semibold rounded-lg' type="text" placeholder='John Doe' />
-					</div>
-					<div className='flex flex-col items-start mt-3'>
-						<label htmlFor='email' className='font-bold text-gray-600 cursor-pointer'>Contact Number</label>
-						<input id='email' className='w-full mt-1 outline-none py-3 px-5 border border-gray-500 font-semibold rounded-lg' type="text" placeholder='eg. user@gmail.com' />
-					</div>
-					<div className='flex flex-col items-start mt-3'>
-						<label htmlFor='password' className='font-bold text-gray-600 cursor-pointer'>Customer Email Address</label>
-						<input id='password' className='w-full mt-1 outline-none py-3 px-5 border border-gray-500 font-semibold rounded-lg' type="text" placeholder='********' />
-					</div>
-					<div className='flex flex-col items-start mt-3'>
-						<label htmlFor='password' className='font-bold text-gray-600 cursor-pointer'>Pincode</label>
-						<input id='password' className='w-full mt-1 outline-none py-3 px-5 border border-gray-500 font-semibold rounded-lg' type="text" placeholder='********' />
-					</div>
-					<div>
-						<button className='text-white font-bold bg-gray-900 duration-200 px-3 py-2 rounded-lg hover:bg-gray-700 mt-3 w-full'>{loading ? <Spinner /> : "Sign Up"}</button>
+				<div className='mt-8'>
+					<h1 className='font-bold text-3xl'>Data: </h1>
+					<div className='grid mt-3 gap-y-6 grid-cols-3'>
+						{
+							bankerData && bankerData.map((data) => {
+								return <BankerCard data={data} />
+							})
+						}
 					</div>
 				</div>
+
 			</div>
 		</>
 	)

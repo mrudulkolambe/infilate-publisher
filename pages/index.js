@@ -1,64 +1,69 @@
+import React from 'react'
+import CampaignCard from '../components/CampaignCard'
+import HeadComponent from '../components/HeadComponent'
+import CampaignUploadDetails from '../components/CampaignUploadDetails'
 import { useState } from 'react'
-import HeadComponent from "../components/HeadComponent";
-import Sidebar from "../components/Sidebar";
-import Spinner from '../components/Spinner';
-import Topbar from "../components/Topbar";
-import { useAuthContext } from "../context/Auth";
+import { useCampaignUpload } from '../context/store'
 import Link from 'next/link'
+import { useMainData } from '../context/Main'
+import { useAuthContext } from '../context/Auth'
+import { useRouter } from 'next/router'
 
-export default function Home() {
-  const { handleSignIn } = useAuthContext()
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false)
-  const signIn = () => {
-    setLoading(true)
-    handleSignIn(email, password)
-    setTimeout(() => {
-      setLoading(false)
-    }, 1000);
-  }
-  return (
-    <>
-      <div className='hidden lg:flex left-position absolute top-20 px-5 py-6 Nunito w-10/12 justify-center items-center calc-height'>
-        <div className='w-6/12 shadow-lg p-5 rounded-lg border'>
-          <h1 className="text-center font-bold text-3xl mb-6">Infilate Authentication</h1>
-          <div className='flex flex-col items-start mt-3'>
-            <label htmlFor='email' className='font-bold text-gray-600 cursor-pointer'>Email Id</label>
-            <input id='email' value={email} onChange={(e) => { setEmail(e.target.value) }} className='w-full mt-1 outline-none py-3 px-5 border border-gray-500 font-semibold rounded-lg' type="text" placeholder='eg. user@gmail.com' />
-          </div>
-          <div className='flex flex-col items-start mt-3'>
-            <label htmlFor='password' className='font-bold text-gray-600 cursor-pointer'>Password</label>
-            <input id='password' value={password} onChange={(e) => { setPassword(e.target.value) }} className='w-full mt-1 outline-none py-3 px-5 border border-gray-500 font-semibold rounded-lg' type="text" placeholder='********' />
-          </div>
-          <div>
-            <button onClick={signIn} className='flex items-center justify-center text-white font-bold bg-gray-900 duration-200 px-3 py-2 rounded-lg hover:bg-gray-700 mt-5 w-full'>{loading ? <Spinner /> : 'Sign In'}</button>
-          </div>
-          <div className='text-sm font-bold mt-2 text-right'>
-            <span>{"Don't Have An Account ? "}<Link href={'/signup'}>Sign Up</Link></span>
-          </div>
-        </div>
-      </div>
+const CampaignUpload = () => {
+	const [displayCard, setDisplayCard] = useState(false)
+	const [detailsData, setDetailsData] = useState()
+	const { campaignData } = useCampaignUpload()
+	const { displayTotalAmount } = useMainData()
+	const { user } = useAuthContext()
+	const router = useRouter()
+	return (
+		<>
+			{displayCard ? <CampaignUploadDetails setDisplayCard={setDisplayCard} data={detailsData} /> : null}
+			<HeadComponent title={'Store'} />
+			<div className=' h-screen w-screen absolute top-6 -z-10'>
+				<div className='hidden lg:block left-position absolute top-20 px-10 py-6 Nunito w-10/12 h-calc-height overflow-scroll'>
+					<div className={user ? 'flex justify-between items-center' : 'hidden'}>
+						<div className='w-8/12 mx-2 h-40 rounded-lg shadow-lg bg-red-400 p-4 flex flex-col justify-around'>
+							<h1 className='text-2xl font-bold'>{"Max Earning"}</h1>
+							<span className='mt-3 text-6xl font-extrabold'>{displayTotalAmount}</span>
+						</div>
+						<div className='w-4/12 mx-2 h-40 rounded-lg shadow-lg bg-red-400 p-4 flex flex-col justify-around'>
+							<h1 className='text-2xl font-bold'>KYC Status: {user && user.kyc}</h1>
+							<button disabled={user && user.kyc == 'Approved' ? true : false} onClick={() => { router.push('/publisher-kyc') }} className='disabled:cursor-not-allowed w-max text-white font-bold bg-gray-900 px-3 py-1 duration-200 rounded-lg hover:bg-gray-700'>Apply For KYC</button>
+						</div>
+					</div>
+					{!user ? <h1 className='font-bold text-4xl mt-2'>Campaigns</h1> : null}
+					<div className='grid mt-8 grid-cols-4 gap-y-4'>
+						{
+							campaignData && campaignData.map((data) => {
+								return <CampaignCard key={data.id} data={data} setDetailsData={setDetailsData} setDisplayCard={setDisplayCard} />
+							})
+						}
+					</div>
+				</div>
+			</div>
 
-      <div className='lg:hidden sm:block absolute top-20 px-5 py-6 Nunito w-full flex flex-col md:flex-row  justify-center items-center calc-height'>
-        <div className='w-full shadow-lg p-3 rounded-lg mt-5'>
-          <h1 className='mt-4 font-bold text-4xl'>Infilate Authentication</h1>
-          <div className='flex flex-col items-start mt-3'>
-            <label htmlFor='email' className='font-bold text-gray-600 cursor-pointer'>Email Id</label>
-            <input id='email' value={email} onChange={(e) => { setEmail(e.target.value) }} className='w-full mt-1 outline-none py-3 px-5 border border-gray-500 font-semibold rounded-lg' type="text" placeholder='eg. user@gmail.com' />
-          </div>
-          <div className='flex flex-col items-start mt-3'>
-            <label htmlFor='password' className='font-bold text-gray-600 cursor-pointer'>Password</label>
-            <input id='password' value={password} onChange={(e) => { setPassword(e.target.value) }} className='w-full mt-1 outline-none py-3 px-5 border border-gray-500 font-semibold rounded-lg' type="text" placeholder='********' />
-          </div>
-          <div>
-            <button onClick={signIn} className='text-white font-bold bg-gray-900 duration-200 px-3 py-2 rounded-lg hover:bg-gray-700 mt-3 w-full'>Send Mail</button>
-          </div>
-          <div className='text-sm font-bold mt-2 text-right'>
-            <span>{"Don't Have An Account ?  "}<Link href={'/signup'}>Sign Up</Link></span>
-          </div>
-        </div>
-      </div>
-    </>
-  )
+			<div className='lg:hidden sm:block absolute top-20 px-5 py-6 Nunito w-full'>
+				<div className={user ? 'flex flex-col items-center' : 'hidden'}>
+					<div className='w-full mx-2 h-40 rounded-lg shadow-lg bg-red-400 p-4 flex flex-col justify-around'>
+						<h1 className='text-2xl font-bold'>{"Max Yesterday's Earning"}</h1>
+						<span className='mt-3 text-6xl font-extrabold'>0</span>
+					</div>
+					<div className='mt-3 w-full mx-2 h-32 rounded-lg shadow-lg bg-red-400 p-4 flex flex-col justify-around'>
+						<h1 className='text-2xl font-bold'>KYC Status</h1>
+						<button className='w-max text-white font-bold bg-gray-900 px-3 py-1 duration-200 rounded-lg hover:bg-gray-700'>Apply For KYC</button>
+					</div>
+				</div>
+				<div className='grid grid-cols-1 md:grid-cols-2 items-center mt-8 gap-y-8 justify-center place-items-center'>
+					{
+						campaignData && campaignData.map((data) => {
+							return <CampaignCard key={data.id} data={data} setDetailsData={setDetailsData} setDisplayCard={setDisplayCard} />
+						})
+					}
+				</div>
+			</div>
+		</>
+	)
 }
+
+export default CampaignUpload

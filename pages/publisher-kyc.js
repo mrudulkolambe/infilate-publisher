@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { doc, getDocs, setDoc } from "firebase/firestore"
+import { doc, updateDoc } from "firebase/firestore"
 import { useAuthContext } from '../context/Auth'
 import Spinner from '../components/Spinner'
 import { db } from '../context/firebase_config'
@@ -7,36 +7,22 @@ import { db } from '../context/firebase_config'
 const PublisherKYC = () => {
 	const [pancardnumber, setPanCardNumber] = useState("")
 	const [aadhaarcardnumber, setAadhaarCardNumber] = useState("")
-	const { user } = useAuthContext()
+	const { user, setAlert } = useAuthContext()
 	const [loading, setLoading] = useState(false)
 	const applyKYC = async () => {
 		if (user) {
-			setLoading(true)
-			const docRef = doc(db, "publisher_database", user && user.uid);
-			const docSnap = await getDocs(docRef);
-
-			if (docSnap.exists()) {
-				console.log("Document data:", docSnap.data());
-				if (user.emailVerified) {
-					await setDoc(doc(db, "publisher_kyc", user.uid), {
-						name: user.displayName,
-						email: user.email,
-						uid: user.uid,
-						phone: docSnap.data().phone,
-						aadhaarcardnumber,
-						pancardnumber,
-						status: 'Pending'
+			if (user.emailVerified) {
+				await updateDoc(doc(db, "publisher_database", user.uid), {
+					aadhaar: aadhaarcardnumber,
+					pan: pancardnumber,
+				})
+					.then(() => {
+						setLoading(false)
+						setAlert('Applied For KYC!');
 					})
-						.then(() => {
-							setLoading(false)
-						})
-				}
-			} else {
-				// doc.data() will be undefined in this case
-				console.log("No such document!");
 			}
-
-
+		} else {
+			console.log("No such document!");
 		}
 	}
 	return (

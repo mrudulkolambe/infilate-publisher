@@ -9,15 +9,18 @@ const AuthContext = createContext();
 
 export function AuthContextProvider({ children }) {
 	const [user, setUser] = useState()
+	const [userData, setUserData] = useState()
 	const router = useRouter()
 	const [totalAmount, setTotalAmount] = useState(0)
 	const [advertiserHoldAmount, setAdvertiserHoldAmount] = useState(0)
 	const [applyForValidationData, setApplyForValidationData] = useState()
 	const [alert, setAlert] = useState('')
+	const [POC, setPOC] = useState()
 	const [withdrawalAmount, setWithdrawalAmount] = useState(0)
 
 	const handleSignOut = () => {
 		signOut(auth).then(() => {
+			console.log('first')
 			setUser()
 			router.push('/')
 		}).catch((error) => {
@@ -43,12 +46,9 @@ export function AuthContextProvider({ children }) {
 		signInWithEmailAndPassword(auth, email, password)
 			.then(async (userCredential) => {
 				const user = userCredential.user;
-				const unsub = onSnapshot(doc(db, "publisher_kyc", user.uid), (doc) => {
-					user.kyc = doc.data().status
-				});
 				if (user.emailVerified) {
 					setUser(user)
-					router.push('/store')
+					router.push('/')
 					const q = query(collection(db, "campaign_details"), where("publisher_id", "==", user.uid), where('reached_advertiser_hold', '==', false), where('timestamp', '<=', Date.now()), where('ready_for_withdrawal', '==', 0),
 						orderBy('timestamp'));
 					let holdAmount = 0
@@ -92,11 +92,11 @@ export function AuthContextProvider({ children }) {
 			});
 	}
 
-	useEffect(() => {
-		if (user && user.emailVerified) {
-			manageData(user)
-		}
-	}, [user]);
+	// useEffect(() => {
+	// 	if (user && user.emailVerified) {
+	// 		manageData(user)
+	// 	}
+	// }, [user]);
 
 	const manageData = async (user) => {
 		const q = query(collection(db, "campaign_details"), where("publisher_id", "==", user.uid), where('ready_for_withdrawal', '>', 0), where('completed_withdrawal', '==', false));
@@ -139,14 +139,51 @@ export function AuthContextProvider({ children }) {
 	}
 
 	useEffect(() => {
+		if (user) {
+			console.log(user)
+			let userData = user
+			const unsub = onSnapshot(doc(db, "publisher_database", user.uid), (doc) => {
+				userData.phone = doc.data().phone,
+					userData.kyc = doc.data().kyc,
+					userData.aadhaar = doc.data().aadhaar,
+					userData.pan = doc.data().pan,
+					userData.banker = doc.data().banker,
+					userData.appliedBanker = doc.data().appliedBanker
+					userData.trackingURLs = doc.data().trackingURLs
+				setUserData(doc.data())
+			});
+			console.log(userData)
+			setUser(userData)
+		}
+	}, [user]);
+
+	useEffect(() => {
 		onAuthStateChanged(auth, (user) => {
 			if (user) {
 				if (user.emailVerified) {
-					const unsub = onSnapshot(doc(db, "publisher_kyc", user.uid), (doc) => {
-						user.kyc = doc.data().status
+					const unsub = onSnapshot(doc(db, "publisher_database", user.uid), (doc) => {
+						user.phone = doc.data().phone,
+							user.kyc = doc.data().kyc,
+							user.aadhaar = doc.data().aadhaar,
+							user.pan = doc.data().pan,
+							user.banker = doc.data().banker,
+							user.appliedBanker = doc.data().appliedBanker
+						setUserData(doc.data())
 					});
 					console.log(user)
 					setUser(user)
+					setUserData(user)
+					const unsub1 = onSnapshot(doc(db, 'POC', 'POC'), (doc) => {
+						setPOC(doc.data())
+					})
+					if (!user) {
+						if (router.pathname === '/' || router.pathname.includes('store') || router.pathname.includes(`banker-market/`)) {
+							return
+						}
+						else {
+							router.push('/')
+						}
+					}
 				}
 				else {
 					router.push('/verification')
@@ -169,10 +206,10 @@ export function AuthContextProvider({ children }) {
 				console.log(user)
 				updateProfile(user, {
 					displayName: name,
-					phoneNumber: phone
+					phoneNumber: phone.toString()
 				}).then(async () => {
 					console.log(user)
-					await setDoc(doc(db, "publisher_database", user.uid), { username: name, email: user.email, uid: user.uid, phone: phone })
+					await setDoc(doc(db, "publisher_database", user.uid), { username: name, email: user.email, uid: user.uid, phone: phone, kyc: 'Pending', banker: false, appliedBanker: false, photoURL: '' })
 				}).catch((error) => {
 					console.log(error)
 				});
@@ -191,7 +228,7 @@ export function AuthContextProvider({ children }) {
 	}, [alert]);
 
 	return (
-		<AuthContext.Provider value={{ auth, handleSignIn, user, handleSignOut, handleSignUp, alert, setAlert, totalAmount, setTotalAmount, advertiserHoldAmount, setUser, applyForValidationData, withdrawalAmount, setWithdrawalAmount }}>
+		<AuthContext.Provider value={{ auth, handleSignIn, user, handleSignOut, handleSignUp, alert, setAlert, totalAmount, setTotalAmount, advertiserHoldAmount, setUser, applyForValidationData, withdrawalAmount, setWithdrawalAmount, POC, userData }}>
 			{children}
 		</AuthContext.Provider>
 	);
