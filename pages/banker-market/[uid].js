@@ -83,15 +83,18 @@ const BankerMarket = () => {
 					.catch(() => {
 						setAlert('Something went wrong!');
 						alert('Something went wrong!')
+						setLoading(false)
 					})
 			} else {
 				setAlert('Fill the details properly')
 				alert('Fill the details properly')
+				setLoading(false)
 			}
 		}
 		else {
 			setAlert('Something went wrong!')
 			alert('Something went wrong!')
+			setLoading(false)
 		}
 	}
 	return (
