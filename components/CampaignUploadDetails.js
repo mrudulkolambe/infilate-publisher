@@ -16,7 +16,7 @@ const CampaignUploadDetails = ({ setDisplayCard, data }) => {
 					</div>
 					<div className='px-2 w-9/12'>
 						<div className='flex'>
-							<div className='mx-1 px-8 rounded-lg py-4 w-8/12 border'>Type: {data && data.type}</div>
+							<div className='mx-1 px-8 rounded-lg py-4 w-8/12 border'>Type: {data && data.category}</div>
 							<div className='mx-1 px-8 rounded-lg py-4 w-4/12 border'>Active</div>
 						</div>
 						<div className='flex mt-4'>

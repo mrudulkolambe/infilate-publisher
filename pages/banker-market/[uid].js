@@ -64,7 +64,7 @@ const BankerMarket = () => {
 					publisher_name: adminData.username,
 					publisher_email: adminData.email,
 					campaign: currentCampaign,
-					redirection: trackingLink
+					redirection: trackingLink,
 				})
 					.then(() => {
 						setLoading(false)
