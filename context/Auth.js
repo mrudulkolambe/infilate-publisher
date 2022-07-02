@@ -2,7 +2,7 @@ import { createUserWithEmailAndPassword, signOut, signInWithEmailAndPassword, up
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { auth, db } from "./firebase_config";
 import { useRouter } from "next/router";
-import { collection, doc, getDocs, increment, onSnapshot, orderBy, query, setDoc, updateDoc, where } from "firebase/firestore";
+import { arrayUnion, collection, doc, getDocs, increment, onSnapshot, orderBy, query, setDoc, updateDoc, where } from "firebase/firestore";
 
 
 const AuthContext = createContext();
@@ -17,6 +17,8 @@ export function AuthContextProvider({ children }) {
 	const [alert, setAlert] = useState('')
 	const [POC, setPOC] = useState()
 	const [withdrawalAmount, setWithdrawalAmount] = useState(0)
+	const [advertiserHoldData, setAdvertiserHoldData] = useState()
+	const [holdData, setHoldData] = useState()
 
 	const handleSignOut = () => {
 		signOut(auth).then(() => {
@@ -49,38 +51,6 @@ export function AuthContextProvider({ children }) {
 				if (user.emailVerified) {
 					setUser(user)
 					router.push('/')
-					const q = query(collection(db, "campaign_details"), where("publisher_id", "==", user.uid), where('reached_advertiser_hold', '==', false), where('timestamp', '<=', Date.now()), where('ready_for_withdrawal', '==', 0),
-						orderBy('timestamp'));
-					let holdAmount = 0
-					const querySnapshot = await getDocs(q)
-					const arr = [];
-					querySnapshot && querySnapshot.forEach(async (document) => {
-						let obj = document.data()
-						obj.id = document.id
-						arr.push(obj);
-						holdAmount += obj.revenue
-						let docRef = doc(db, "campaign_details", obj.id);
-						await updateDoc(docRef, {
-							reached_advertiser_hold: true,
-						})
-					})
-					setApplyForValidationData(arr)
-					const docRef = doc(db, "publisher_database", user.uid);
-					if (holdAmount !== 0) {
-						await updateDoc(docRef, {
-							advertiserAmount: holdAmount,
-							applied_for_verification: false,
-							validationData: arr
-						})
-							.then(async () => {
-								setAlert('Your wallet has been updated, Please check!')
-							});
-						setAdvertiserHoldAmount(holdAmount)
-					} else {
-						const unsub = onSnapshot(doc(db, "publisher_database", user.uid), (document) => {
-							setAdvertiserHoldAmount(document.data().advertiserAmount)
-						});
-					}
 				} else {
 					router.push('/verification')
 					setAlert('Verification Email sent to your email! Also check your spam folder')
@@ -143,39 +113,121 @@ export function AuthContextProvider({ children }) {
 			console.log(user)
 			let userData = user
 			const unsub = onSnapshot(doc(db, "publisher_database", user.uid), (doc) => {
-				userData.phone = doc.data().phone,
-					userData.kyc = doc.data().kyc,
-					userData.aadhaar = doc.data().aadhaar,
-					userData.pan = doc.data().pan,
-					userData.banker = doc.data().banker,
-					userData.appliedBanker = doc.data().appliedBanker
-					userData.trackingURLs = doc.data().trackingURLs
+				userData.phone = doc.data().phone
+				userData.kyc = doc.data().kyc
+				userData.aadhaar = doc.data().aadhaar
+				userData.pan = doc.data().pan
+				userData.banker = doc.data().banker
+				userData.appliedBanker = doc.data().appliedBanker
+				userData.trackingURLs = doc.data().trackingURLs
+				userData.advertiserHold = doc.data().advertiserHold
+				userData.advertiserHoldData = doc.data().advertiserHoldData
+				userData.holdData = doc.data().holdData
+				userData.hold = doc.data().hold
+				userData.requested_withdrawal = doc.data().requested_withdrawal
+				userData.ready_for_withdrawal = doc.data().ready_for_withdrawal
+				userData.completed = doc.data().completed
+				userData.payment_records = doc.data().payment_records
 				setUserData(doc.data())
 			});
-			console.log(userData)
-			setUser(userData)
+			setUserData(userData)
 		}
 	}, [user]);
 
 	useEffect(() => {
-		onAuthStateChanged(auth, (user) => {
+		handleAdvertiserData()
+	}, [advertiserHoldData]);
+
+	const handleAdvertiserData = async () => {
+		advertiserHoldData && advertiserHoldData.forEach(async (document) => {
+			const docRef = doc(db, "campaign_details", document.id);
+			const docRef1 = doc(db, "publisher_database", document.publisher_id);
+
+			await updateDoc(docRef, {
+				advertiser_hold_completed: true,
+				status: 'Advertiser Hold'
+			});
+			await updateDoc(docRef1, {
+				advertiserHold: increment(document.revenue),
+				hold: increment(-document.revenue),
+				advertiserHoldData: arrayUnion(document.id)
+			})
+		})
+		setAdvertiserHoldData()
+	}
+
+
+	const handleHoldData = async () => {
+		holdData && holdData.forEach(async (document) => {
+			const docRef = doc(db, "campaign_details", document.id);
+			const docRef1 = doc(db, "publisher_database", document.publisher_id);
+
+			await updateDoc(docRef, {
+				hold_completed: true,
+				status: 'On Hold'
+			});
+			await updateDoc(docRef1, {
+				hold: increment(document.revenue),
+			})
+		})
+		setHoldData()
+	}
+
+	useEffect(() => {
+		if (user) {
+			handleHoldData()
+		}
+	}, [holdData, user]);
+
+	useEffect(() => {
+		onAuthStateChanged(auth, async (user) => {
 			if (user) {
 				if (user.emailVerified) {
 					const unsub = onSnapshot(doc(db, "publisher_database", user.uid), (doc) => {
-						user.phone = doc.data().phone,
-							user.kyc = doc.data().kyc,
-							user.aadhaar = doc.data().aadhaar,
-							user.pan = doc.data().pan,
-							user.banker = doc.data().banker,
-							user.appliedBanker = doc.data().appliedBanker
-						setUserData(doc.data())
+						user.phone = doc.data().phone
+						user.kyc = doc.data().kyc
+						user.aadhaar = doc.data().aadhaar
+						user.pan = doc.data().pan
+						user.banker = doc.data().banker
+						user.appliedBanker = doc.data().appliedBanker
+						user.trackingURLs = doc.data().trackingURLs
+						user.advertiserHold = doc.data().advertiserHold
+						user.advertiserHoldData = doc.data().advertiserHoldData
+						user.hold = doc.data().hold
+						user.requested_withdrawal = doc.data().requested_withdrawal
+						user.ready_for_withdrawal = doc.data().ready_for_withdrawal
+						user.completed = doc.data().completed,
+							user.payment_records = doc.data().payment_records,
+							setUserData(user)
+						console.log(userData)
 					});
-					console.log(user)
 					setUser(user)
 					setUserData(user)
 					const unsub1 = onSnapshot(doc(db, 'POC', 'POC'), (doc) => {
 						setPOC(doc.data())
 					})
+					//  
+					const q1 = query(collection(db, "campaign_details"), where("publisher_id", "==", user.uid), where('hold_completed', '==', false));
+					const querySnapshot1 = await getDocs(q1);
+					let arr1 = [];
+					// let newDateObj = new Date()
+					querySnapshot1.forEach(async (document, i) => {
+						let obj = document.data()
+						obj.id = document.id
+						arr1.push(obj);
+					});
+					setHoldData(arr1)
+
+					const q2 = query(collection(db, "campaign_details"), where("publisher_id", "==", user && user.uid), where('advertiser_hold_completed', '==', false), where('advertiser_timestamp', '<=', Date.now()));
+					const querySnapshot2 = await getDocs(q2);
+					let arr2 = [];
+					querySnapshot2.forEach(async (document, i) => {
+						let obj = document.data()
+						obj.id = document.id
+						arr2.push(obj);
+					});
+					setAdvertiserHoldData(arr2)
+
 					if (!user) {
 						if (router.pathname === '/' || router.pathname.includes('store') || router.pathname.includes(`banker-market/`)) {
 							return
@@ -209,7 +261,7 @@ export function AuthContextProvider({ children }) {
 					phoneNumber: phone.toString()
 				}).then(async () => {
 					console.log(user)
-					await setDoc(doc(db, "publisher_database", user.uid), { username: name, email: user.email, uid: user.uid, phone: phone, kyc: 'Pending', banker: false, appliedBanker: false, photoURL: '' })
+					await setDoc(doc(db, "publisher_database", user.uid), { username: name, email: user.email, uid: user.uid, phone: phone, kyc: 'Pending', banker: false, appliedBanker: false, photoURL: '', requested_withdrawal: false, completed: true })
 				}).catch((error) => {
 					console.log(error)
 				});
@@ -228,7 +280,7 @@ export function AuthContextProvider({ children }) {
 	}, [alert]);
 
 	return (
-		<AuthContext.Provider value={{ auth, handleSignIn, user, handleSignOut, handleSignUp, alert, setAlert, totalAmount, setTotalAmount, advertiserHoldAmount, setUser, applyForValidationData, withdrawalAmount, setWithdrawalAmount, POC, userData }}>
+		<AuthContext.Provider value={{ auth, handleSignIn, user, handleSignOut, handleSignUp, alert, setAlert, totalAmount, setTotalAmount, advertiserHoldAmount, setUser, applyForValidationData, withdrawalAmount, setWithdrawalAmount, POC, userData, holdData, advertiserHoldData }}>
 			{children}
 		</AuthContext.Provider>
 	);

@@ -10,23 +10,23 @@ export function ReportDataProvider({ children }) {
 	const { user } = useAuthContext()
 	const [reportData, setReportData] = useState();
 
-	useEffect(() => {
-	if (user && user.emailVerified) {
-			const q = query(collection(db, "report_data"));
-			const unsubscribe = onSnapshot(q, (querySnapshot) => {
-				const data = [];
-				querySnapshot.forEach((doc) => {
-					let obj = doc.data()
-					obj.id = doc.id
-					data.push(obj)
-				});
-				setReportData(data)
-			});
-			return () => {
-				unsubscribe()
-			}
-		}
-	}, [user]);
+	// useEffect(() => {
+	// if (user && user.emailVerified) {
+	// 		const q = query(collection(db, "report_data"));
+	// 		const unsubscribe = onSnapshot(q, (querySnapshot) => {
+	// 			const data = [];
+	// 			querySnapshot.forEach((doc) => {
+	// 				let obj = doc.data()
+	// 				obj.id = doc.id
+	// 				data.push(obj)
+	// 			});
+	// 			setReportData(data)
+	// 		});
+	// 		return () => {
+	// 			unsubscribe()
+	// 		}
+	// 	}
+	// }, [user]);
 
 
 	return (
