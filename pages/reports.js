@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { BsSearch } from 'react-icons/bs'
 import HeadComponent from '../components/HeadComponent'
 import ReportManagerTableRow from '../components/ReportManagerTableRow'
@@ -8,14 +8,32 @@ import { useReportData } from '../context/reportData'
 
 const ReportManager = () => {
 	const { mainData } = useMainData()
+	const [searchReportData, setSearchReportData] = useState(mainData);
+	const [searchString, setSearchString] = useState('');
+
+	useEffect(() => {
+		console.log(searchString)
+		let arr = []
+		mainData && mainData.forEach((data) => {
+			if (data.campaign_id.toLowerCase().includes(searchString.toLowerCase()) || data.publisher_name.toLowerCase().includes(searchString.toLowerCase()) || data.campaign_name.toLowerCase().includes(searchString.toLowerCase()) || data.publisher_id.toLowerCase().includes(searchString.toLowerCase())) {
+				arr.push(data)
+				console.log(data)
+			}
+		})
+		setSearchReportData(arr)
+	}, [searchString]);
+
+	useEffect(() => {
+		setSearchReportData(mainData)
+	}, [mainData]);
 	return (
 		<>
 			<HeadComponent title={'Report Manager'} />
-			<div className='lg:block hidden left-position absolute top-20 px-5 py-6 Nunito w-10/12'>
+			<div className='lg:block hidden left-position absolute top-24 px-5 py-6 Nunito w-10/12'>
 				<div className='flex justify-between items-center px-4'>
 					<h2 className='text-4xl font-bold'>Reports</h2>
 					<div className='relative flex items-center border-gray-500 border rounded-lg overflow-hidden'>
-						<input type="text" className='outline-none px-4 py-2 pr-8' placeholder='Search...' />
+						<input value={searchString} onChange={(e) => { setSearchString(e.target.value) }} type="text" className='outline-none px-4 py-2 pr-8' placeholder='Search...' />
 						<BsSearch className='absolute right-2 ml-3' />
 					</div>
 				</div>
@@ -38,7 +56,7 @@ const ReportManager = () => {
 						</thead>
 						<tbody className='mt-3 height-report overflow-auto'>
 							{
-								mainData && mainData.map((data, i) => {
+								searchReportData && searchReportData.map((data, i) => {
 									return <ReportManagerTableRow key={data.id} index={i} data={data} />
 								})
 							}
