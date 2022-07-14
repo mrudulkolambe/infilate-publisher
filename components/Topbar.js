@@ -17,7 +17,7 @@ const Topbar = ({ show, setShow }) => {
 		},
 		{
 			tab: 'Tracking Panel',
-			path: '/tracking-panel'
+			path: 'https://infilatemediagroup296.offer18.com/m/signup_self_aff?r=&am='
 		},
 		{
 			tab: 'Reports',
