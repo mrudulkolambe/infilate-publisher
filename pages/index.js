@@ -14,9 +14,9 @@ const CampaignUpload = () => {
 	const [detailsData, setDetailsData] = useState()
 	const { campaignData } = useCampaignUpload()
 	const { displayTotalAmount } = useMainData()
-	const { user } = useAuthContext()
+	const { user, userData } = useAuthContext()
 	const router = useRouter()
-	return (
+	return ( 
 		<>
 			{displayCard ? <CampaignUploadDetails setDisplayCard={setDisplayCard} data={detailsData} /> : null}
 			<HeadComponent title={'Store'} />
@@ -25,10 +25,10 @@ const CampaignUpload = () => {
 					<div className={user ? 'flex justify-between items-center' : 'hidden'}>
 						<div className='w-8/12 mx-2 h-40 rounded-lg shadow-lg bg-red-400 p-4 flex flex-col justify-around'>
 							<h1 className='text-2xl font-bold'>{"Max Earning"}</h1>
-							<span className='mt-3 text-6xl font-extrabold'>{displayTotalAmount}</span>
+							<span className='mt-3 text-6xl font-extrabold'>{userData && userData.hold || 0}</span>
 						</div>
 						<div className='w-4/12 mx-2 h-40 rounded-lg shadow-lg bg-red-400 p-4 flex flex-col justify-around'>
-							<h1 className='text-2xl font-bold'>KYC Status: {user && user.kyc}</h1>
+							<h1 className='text-2xl font-bold'>KYC Status: {user && user.kyc || "Pending"}</h1>
 							<button disabled={user && user.kyc == 'Approved' ? true : false} onClick={() => { router.push('/publisher-kyc') }} className='disabled:cursor-not-allowed w-max text-white font-bold bg-gray-900 px-3 py-1 duration-200 rounded-lg hover:bg-gray-700'>Apply For KYC</button>
 						</div>
 					</div>

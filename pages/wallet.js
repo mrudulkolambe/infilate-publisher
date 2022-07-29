@@ -122,15 +122,15 @@ const PaymentWallet = () => {
 						<div className='bg-gray-200 w-full rounded-lg shadow-lg p-3'>
 							<div className='bg-white rounded-t-lg flex flex-col p-3 border-b border-gray-400' >
 								<h2 className='text-gray-500 text-sm'>On Hold</h2>
-								<h2 className='text-lg font-bold'>{userData && userData.hold}</h2>
+								<h2 className='text-lg font-bold'>{userData && userData.hold || 0}</h2>
 							</div>
 							<div className='bg-white flex flex-col p-3 border-b border-gray-400' >
 								<h2 className='text-gray-500 text-sm'>Advertiser Hold</h2>
-								<h2 className='text-lg font-bold'>{userData && userData.advertiserHold}</h2>
+								<h2 className='text-lg font-bold'>{userData && userData.advertiserHold || 0}</h2>
 							</div>
 							<div className='bg-white flex flex-col p-3' >
 								<h2 className='text-gray-500 text-sm'>Ready for Withdrawal</h2>
-								<h2 className='text-lg font-bold'>{userData && userData.ready_for_withdrawal}</h2>
+								<h2 className='text-lg font-bold'>{userData && userData.ready_for_withdrawal || 0}</h2>
 							</div>
 							<div className='flex flex-col mt-2'>
 								<button onClick={verification} className='my-1 px-2 py-1 bg-gray-900 rounded-lg font-bold text-white hover:bg-gray-700 duration-300'>{loading1 ? <Spinner /> : 'Request Verification'}</button>

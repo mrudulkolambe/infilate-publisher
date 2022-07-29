@@ -25,7 +25,7 @@ const Topbar = ({ show, setShow }) => {
 		},
 		{
 			tab: 'Banker Market',
-			path: `/banker-market`
+			path: `https://infilate-banker-market.vercel.app`
 		}
 	]
 	const [navTabs, setNavTabs] = useState(navs)

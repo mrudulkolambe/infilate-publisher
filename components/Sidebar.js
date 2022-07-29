@@ -6,6 +6,7 @@ import Alert from "./Alert";
 import { useRouter } from "next/router";
 import { doc, updateDoc } from "firebase/firestore";
 import Spinner from "./Spinner";
+import InfilateLogo from './InfilateLogo'
 import { db } from "../context/firebase_config";
 
 const Sidebar = ({ setShow }) => {
@@ -34,7 +35,7 @@ const Sidebar = ({ setShow }) => {
       <Alert text={alert} />
       <div className="lg:block hidden fixed w-2/12 bg-white border-r shadow-xl h-screen p-3 pt-0 Nunito  top-6 rounded-tl-3xl">
         <div className="flex items-center h-20 justify-center">
-          <h1 className="font-bold text-5xl text-center">infilate</h1>
+          <h1 className="font-bold text-5xl text-center"><InfilateLogo/></h1>
         </div>
         <div>
           <div className="flex flex-col items-center mt-8">
